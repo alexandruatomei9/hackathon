@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Login</title>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/ui-darkness/jquery-ui.css"/>
+<script
+ 	src="https://code.jquery.com/jquery-2.2.4.min.js"
+ 	integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+ 	crossorigin="anonymous"></script>
+<script
+	src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+	integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+	crossorigin="anonymous"></script>
+
+<script>
+	$(document).ready(function() {
+		$('#loginForm').submit(function(event) {
+			window.location.href = 'board.html';
+			// $.post('/api/login', function(data) {
+  	// 			window.location.href = 'board.html';
+			// });
+  			event.preventDefault();
+		});
+	});
+</script>
+</head>
+
+<body>
+<form id="loginForm">
+	<div>
+		User: <input size="50" id="user">
+	</div>
+	<div>
+		Password: <input size="50" id="user" type="password">
+	</div>
+	<input type="submit" value="Login">
+</form>
+</body>
+</html>

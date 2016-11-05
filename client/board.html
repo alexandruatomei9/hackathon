@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Board</title>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/ui-darkness/jquery-ui.css"/>
+<script
+ 	src="https://code.jquery.com/jquery-2.2.4.min.js"
+ 	integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+ 	crossorigin="anonymous"></script>
+<script
+	src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+	integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+	crossorigin="anonymous"></script>
+
+<link rel="stylesheet" type="text/css" href="jquery.datetimepicker.min.css"/ >
+<script src="jquery.datetimepicker.min.js"></script>
+
+
+<script>
+    let eventList = [{
+        name: "Fotbal",
+        date: 1478343166857,
+        location: "Sspal",
+        creator: "SVIasi",
+        description: "Dam la gioale."
+    }, {
+        name: "Poker",
+        date: 1478343166857,
+        location: "Narcis home",
+        creator: "Narcis",
+        description: "Pierdem bani."
+    }];
+
+    let interestList = [{
+        name: 'Fotbal',
+        id: 1
+    }, {
+        name: 'Poker',
+        id: 2
+    }, {
+        name: 'Fosbal',
+        id: 3
+    }, {
+        name: 'Boardgames',
+        id: 4
+    }];
+
+    let myInterestList = [{
+        name: 'Fotbal',
+        id: 1
+    }, {
+        name: 'Poker',
+        id: 2
+    }];
+
+    let userDetails = {
+        userName: 'Cutarescu',
+        userSurname: 'Ion',
+        userEmail: 'cutarescu.ion@gmail.com'
+    };
+
+
+    $(function() {
+        eventList.forEach(event => {
+            $('#allEventsList').append(`
+                <h3>${event.name} Date:${(new Date(event.date)).toLocaleString()} Location:${event.location} Creator:${event.creator}</h3>
+              <div>
+                <p>${event.description}</p>
+              </div>`
+            );
+        });
+
+        eventList.forEach(event => {
+            $('#myEventsList').append(`
+                <h3>${event.name} Date:${(new Date(event.date)).toLocaleString()} Location:${event.location} Creator:${event.creator}</h3>
+              <div>
+                <p>${event.description}</p>
+              </div>`
+            );
+        });
+
+        interestList.forEach(interest => {
+            $('#newInterest').append(`<option value=${interest.id}>${interest.name}</option>`);
+        });
+
+        interestList.forEach((interest, index) => {
+            let checked = myInterestList.find(myInterest => myInterest.id === interest.id) ? 'checked' : '';
+            $('#interests-list').append(`<label for="checkbox-${index}">${interest.name}</label>
+            <input type="checkbox" name="checkbox-${index}" id="checkbox-${index}" ${checked}>`);
+        });
+
+        $('#tabs').tabs();
+        $('#allEventsList').accordion();
+        $('#myEventsList').accordion();
+
+        $('#eventType').selectmenu();
+        $('#newInterest').selectmenu();
+        $('#eventTime').datetimepicker();
+
+        $('#interests-list input').checkboxradio({
+            icon: false
+        });
+
+        $( ".controlgroup-vertical" ).controlgroup({"direction": "vertical"});
+
+        $('#userName').val(userDetails.userName);
+        $('#userSurname').val(userDetails.userSurname);
+        $('#userEmail').val(userDetails.userEmail);
+    });
+</script>
+</head>
+
+<body style="background-color: black">
+    <div id="tabs">
+      <ul>
+        <li><a href="#tabs-1">Events</a></li>
+        <li><a href="#tabs-2">My events</a></li>
+        <li><a href="#tabs-3">Create event</a></li>
+        <li><a href="#tabs-4">Profile</a></li>
+      </ul>
+      <div id="tabs-1">
+          <select name="event-type" id="eventType">
+              <option selected="selected">All</option>
+              <option>Filtered</option>
+            </select>
+        <div id="allEventsList"></div>
+      </div>
+      <div id="tabs-2">
+        <div id="myEventsList"></div>
+      </div>
+      <div id="tabs-3">
+        <form id="createEvent">
+            <div>
+                Event name: <input id="eventType">
+            </div>
+            <div>
+                Event time: <input id="eventTime">
+            </div>
+            <div>
+                Event location: <input id="eventLocation">
+            </div>
+            <div>
+                Interests: <select id="newInterest"></select>
+
+            </div>
+            <div>
+                Description:
+                <textarea></textarea>
+            </div>
+            <input type="submit" value="Create">
+        </form>
+      </div>
+      <div id="tabs-4">
+          <fieldset id="interests-list">
+              <legend>Interest</legend>
+          </fieldset>
+          <fieldset>
+              <legend>User info</legend>
+              <div class="controlgroup-vertical">
+                  <label for="userName">User name</label>
+                  <input name="userName" id="userName">
+                  <label for="userSurname">User surname</label>
+                  <input name="userSurname" id="userSurname">
+                  <label for="userEmail">User email</label>
+                  <input name="userEmail" id="userEmail">
+              </div>
+          </fieldset>
+          <input type="submit" value="Submit"/>
+      </div>
+    </div>
+
+
+</body>
+</html>
