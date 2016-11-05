@@ -1,0 +1,60 @@
+html, body{
+  height:100%;
+  margin: 0;
+}
+
+.login-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.board-screen {
+  height: 99%;
+}
+
+.joined-true .join {
+    display: none;
+}
+
+.leave {
+    display: none;
+}
+.joined-true .leave {
+    display: inline-block;
+}
+
+#createEvent {
+    width: 500px;
+}
+
+#createEvent input {
+    float: right;
+    height: 20px;
+}
+
+#createEvent label {
+    display: inline-block;
+    height: 40px;
+}
+
+#newInterest-button {
+    float: right;
+}
+
+textarea {
+    float: right;
+}
+
+.subtmi {
+    height: 40px !important;
+    margin-top: 50px;
+    float: left !important;
+}
+
+.userInfo label {
+    width: 90px;
+    display: inline-block;
+    height: 42px;
+}

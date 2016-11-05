@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Board</title>
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/ui-darkness/jquery-ui.css"/>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/pepper-grinder/jquery-ui.css"/>
 <script
  	src="https://code.jquery.com/jquery-2.2.4.min.js"
  	integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
@@ -16,7 +16,7 @@
 <link rel="stylesheet" type="text/css" href="jquery.datetimepicker.min.css"/ >
 <script src="jquery.datetimepicker.min.js"></script>
 
-
+<link rel="stylesheet" href="style.css"/>
 <script>
     let eventList = [{
         name: "Fotbal",
@@ -31,6 +31,7 @@
         creator: "Narcis",
         description: "Pierdem bani."
     }];
+    let myEventList;
 
     let interestList = [{
         name: 'Fotbal',
@@ -55,64 +56,120 @@
     }];
 
     let userDetails = {
+        id: 1,
         userName: 'Cutarescu',
         userSurname: 'Ion',
         userEmail: 'cutarescu.ion@gmail.com'
     };
+    const server = 'http://192.168.57.192:8080/api/';
 
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const userId = user.id;
+
+    function join(el, id) {
+        $.post(server + 'event/' + id, {user_id: userId}, function(data) {
+        });
+        $($(el).parent()[0]).toggleClass('joined-true');
+    }
+
+    function leave(el, id) {
+        // $.delete(server + 'event/' + id, {user_id: userId}, function(data) {
+        // });
+        $.ajax({
+            url: server + 'event/' + id,
+            type: 'DELETE',
+            data:  {user_id: userId},
+            success: function(result) {
+                // Do something with the result
+            }
+        });
+        $($(el).parent()[0]).toggleClass('joined-true');
+    }
 
     $(function() {
-        eventList.forEach(event => {
-            $('#allEventsList').append(`
-                <h3>${event.name} Date:${(new Date(event.date)).toLocaleString()} Location:${event.location} Creator:${event.creator}</h3>
-              <div>
-                <p>${event.description}</p>
-              </div>`
-            );
+        $.get(server + 'events/' + userId, function(data) {
+            myEventList = data.events;
         });
 
-        eventList.forEach(event => {
-            $('#myEventsList').append(`
-                <h3>${event.name} Date:${(new Date(event.date)).toLocaleString()} Location:${event.location} Creator:${event.creator}</h3>
-              <div>
-                <p>${event.description}</p>
-              </div>`
-            );
+        $.get(server + 'events', function(data) {
+            eventList = data.events;
+
+            eventList.forEach(event => {
+                let isJoined = myEventList.findIndex(myEvent => event.id === myEvent.id) !== -1;
+
+                $('#allEventsList').append(`
+                    <h3>
+                        ${event.name} Date:${(new Date(event.date)).toLocaleString()}
+                    </h3>
+                    <div class="joined-${isJoined}">
+                        Location:${event.location}
+                        <p>Creator:${event.creator.name}</p>
+                        <p>${event.description}</p>
+                        <button class="join ui-widget ui-controlgroup-item ui-button ui-corner-all" onclick="join(this, ${event.id})">Join</button>
+                        <button class="leave ui-widget ui-controlgroup-item ui-button ui-corner-all" onclick="leave(this, ${event.id})">Leave</button>
+                    </div>`
+                );
+            });
+
+            eventList.forEach(event => {
+                $('#myEventsList').append(`
+                    <h3>${event.name} Date:${(new Date(event.date)).toLocaleString()}</h3>
+                  <div>
+                    Location:${event.location}
+                    <p>Creator:${event.creator.name}</p>
+                    <p>${event.description}</p>
+                  </div>`
+                );
+            });
+
+            interestList.forEach(interest => {
+                $('#newInterest').append(`<option value=${interest.id}>${interest.name}</option>`);
+            });
+
+            interestList.forEach((interest, index) => {
+                let checked = myInterestList.find(myInterest => myInterest.id === interest.id) ? 'checked' : '';
+                $('#interests-list').append(`<label for="checkbox-${index}">${interest.name}</label>
+                <input type="checkbox" name="checkbox-${index}" id="checkbox-${index}" ${checked}>`);
+            });
+
+
+            $('#allEventsList').accordion();
+            $('#myEventsList').accordion();
+
+            $('#newInterest').selectmenu();
+            $('#eventTime').datetimepicker();
+
+            $('#interests-list input').checkboxradio({
+                icon: false
+            });
+
+            $('#tabs').tabs();
+
+            $('#userName').val(user.name);
+            $('#userSurname').val(user.surname);
+            $('#userEmail').val(user.email);
         });
 
-        interestList.forEach(interest => {
-            $('#newInterest').append(`<option value=${interest.id}>${interest.name}</option>`);
+
+        $('#createEvent').submit(function(event) {
+            $.post(server + 'event' , {
+                user_id: userId,
+                name: $('#eventName').val(),
+                date: $('#eventTime').val(),
+                location: $('#eventLocation').val(),
+                description: $('#createDescription').val(),
+            }, function(data) {
+                $('#createEvent')[0].reset();
+            });
+            event.preventDefault();
         });
 
-        interestList.forEach((interest, index) => {
-            let checked = myInterestList.find(myInterest => myInterest.id === interest.id) ? 'checked' : '';
-            $('#interests-list').append(`<label for="checkbox-${index}">${interest.name}</label>
-            <input type="checkbox" name="checkbox-${index}" id="checkbox-${index}" ${checked}>`);
-        });
-
-        $('#tabs').tabs();
-        $('#allEventsList').accordion();
-        $('#myEventsList').accordion();
-
-        $('#eventType').selectmenu();
-        $('#newInterest').selectmenu();
-        $('#eventTime').datetimepicker();
-
-        $('#interests-list input').checkboxradio({
-            icon: false
-        });
-
-        $( ".controlgroup-vertical" ).controlgroup({"direction": "vertical"});
-
-        $('#userName').val(userDetails.userName);
-        $('#userSurname').val(userDetails.userSurname);
-        $('#userEmail').val(userDetails.userEmail);
     });
 </script>
 </head>
 
-<body style="background-color: black">
-    <div id="tabs">
+<body>
+    <div id="tabs" class="board-screen">
       <ul>
         <li><a href="#tabs-1">Events</a></li>
         <li><a href="#tabs-2">My events</a></li>
@@ -120,35 +177,38 @@
         <li><a href="#tabs-4">Profile</a></li>
       </ul>
       <div id="tabs-1">
-          <select name="event-type" id="eventType">
+          <!-- <select name="event-type" id="eventType">
               <option selected="selected">All</option>
               <option>Filtered</option>
-            </select>
+            </select> -->
         <div id="allEventsList"></div>
       </div>
       <div id="tabs-2">
         <div id="myEventsList"></div>
       </div>
       <div id="tabs-3">
-        <form id="createEvent">
+        <form id="createEvent" submit="createEvent()">
             <div>
-                Event name: <input id="eventType">
+                <label for="eventName">Event name</label>
+                <input name="eventName" id="eventName" class="form-control ui-selectmenu-button ui-selectmenu-button-closed ui-corner-all ui-button ui-widget">
             </div>
             <div>
-                Event time: <input id="eventTime">
+                <label for="eventTime">Event time</label>
+                <input name="eventTime" id="eventTime" class="form-control ui-selectmenu-button ui-selectmenu-button-closed ui-corner-all ui-button ui-widget">
             </div>
             <div>
-                Event location: <input id="eventLocation">
+                <label for="eventLocation">Event location</label>
+                <input name="eventLocation" id="eventLocation" class="form-control ui-selectmenu-button ui-selectmenu-button-closed ui-corner-all ui-button ui-widget">
             </div>
             <div>
-                Interests: <select id="newInterest"></select>
-
+                <label for="eventLocation">Interests</label>
+                <select id="newInterest"></select>
             </div>
             <div>
                 Description:
-                <textarea></textarea>
+                <textarea id="createDescription" class="form-control ui-selectmenu-button ui-selectmenu-button-closed ui-corner-all ui-button ui-widget"></textarea>
             </div>
-            <input type="submit" value="Create">
+            <input type="submit" value="Create" class="ui-widget ui-controlgroup-item ui-button ui-corner-all subtmi">
         </form>
       </div>
       <div id="tabs-4">
@@ -157,16 +217,22 @@
           </fieldset>
           <fieldset>
               <legend>User info</legend>
-              <div class="controlgroup-vertical">
-                  <label for="userName">User name</label>
-                  <input name="userName" id="userName">
-                  <label for="userSurname">User surname</label>
-                  <input name="userSurname" id="userSurname">
-                  <label for="userEmail">User email</label>
-                  <input name="userEmail" id="userEmail">
+              <div class="userInfo">
+                  <div>
+                      <label for="userName">Name</label>
+                      <input name="userName" id="userName" class="form-control ui-selectmenu-button ui-selectmenu-button-closed ui-corner-all ui-button ui-widget">
+                  </div>
+                  <div>
+                      <label for="userSurname">Surname</label>
+                      <input name="userSurname" id="userSurname" class="form-control ui-selectmenu-button ui-selectmenu-button-closed ui-corner-all ui-button ui-widget">
+                  </div>
+                  <div>
+                      <label for="userEmail">Email</label>
+                      <input name="userEmail" id="userEmail" class="form-control ui-selectmenu-button ui-selectmenu-button-closed ui-corner-all ui-button ui-widget">
+                  </div>
               </div>
           </fieldset>
-          <input type="submit" value="Submit"/>
+          <input type="submit" value="Submit" class="ui-widget ui-controlgroup-item ui-button ui-corner-all"/>
       </div>
     </div>
 
